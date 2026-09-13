@@ -141,6 +141,8 @@ every pipeline run and written to `reports/benchmark_correlations.json`; the
 values above are from the run this README's sample output was generated
 from.
 
+![Production Score plotted against WS/48, BPM, and VORP, each with a fitted trend line and the correlation coefficient shown on the chart](reports/benchmark_scatter.png)
+
 ## 5. Limitations
 
 Read this before treating the leaderboard as gospel.
@@ -216,6 +218,9 @@ Outputs land in `reports/`:
 
 - `leaderboard.csv` -- every qualified player, ranked by Value Score
 - `value_chart.png` -- top/bottom-N bar chart
+- `value_scatter.png` -- whole-league Production Score vs. cap hit
+- `benchmark_scatter.png` -- Production Score vs. WS/48, BPM, VORP (section 4)
+- `team_value.png` -- average Value Score by team
 - `benchmark_correlations.json` -- the correlation numbers from section 4
 - `reconciliation_report.md` -- every player who failed to match across sources
 
@@ -230,6 +235,8 @@ pytest -v
 From a full pipeline run on 2025-26 season stats and 2026-27 cap hits
 (410 players matched across sources, 340 cleared the qualification filter).
 Full data in `reports/leaderboard.csv`.
+
+![Whole qualified league plotted as Production Score against 2026-27 cap hit on a log scale, colored on a blue-to-red diverging scale by Value Score](reports/value_scatter.png)
 
 ### Top 15 most undervalued
 
@@ -271,6 +278,25 @@ Full data in `reports/leaderboard.csv`.
 | 327 | De'Aaron Fox | SAS | $49.80M | 62.2 | 4.1 |
 | 326 | Bam Adebayo | MIA | $49.80M | 64.3 | 4.4 |
 
+![Horizontal bar chart of the top 15 most undervalued contracts in blue and the bottom 15 most overpaid in red](reports/value_chart.png)
+
+### Team payroll efficiency
+
+Rolling the same Value Scores up by roster shows which front offices are
+getting the most production per dollar across their qualified players, not
+just which single player has the best or worst deal:
+
+![Horizontal bar chart of average Value Score by team, sorted descending, on the same blue-to-red diverging scale](reports/team_value.png)
+
+Boston tops this list on the strength of a deep, cheap bench (Vučević,
+Queta, Garza, Payton II all landed in the top-15 undervalued table above)
+layered under a still-productive core. Houston sits last, largely on the
+back of Dorian Finney-Smith's contract -- the single worst individual Value
+Score in the league this run. A team average over roughly 8-15 qualified
+players per roster is a small sample on its own; read this chart as a
+snapshot of this run's roster construction, not a stable front-office
+grade.
+
 ### Reading the results
 
 Notice the "most overpaid" list is full of good-to-great players
@@ -308,3 +334,9 @@ Decisions made without pausing for approval, and the reasoning behind them:
 - **Qualification threshold:** 500 minutes / 20 games, a common rule-of-thumb
   cutoff in public NBA analytics work for separating a real sample from
   small-sample noise.
+- **Chart palette:** a single validated diverging blue/red scale (from
+  Anthropic's data-viz color methodology) used consistently everywhere a
+  chart encodes Value Score, so blue always means "undervalued" and red
+  always means "overpaid" across all four charts, rather than each chart
+  picking its own colors. The benchmark scatter uses a plain single accent
+  hue instead, since it has no over/underpaid axis to encode.

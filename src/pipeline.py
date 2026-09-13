@@ -83,8 +83,10 @@ def run(skip_fetch: bool, config_path: str) -> None:
 
     # --- 4. Benchmark ---
     click.echo("[4/5] Benchmarking Production Score against WS/48, BPM, VORP...")
+    benchmark_merged = None
+    correlations = None
     try:
-        _, correlations = benchmark.run(valued_df, advanced_season_end_year)
+        benchmark_merged, correlations = benchmark.run(valued_df, advanced_season_end_year)
         with open(BENCHMARK_JSON, "w", encoding="utf-8") as fh:
             json.dump(correlations, fh, indent=2)
         for metric, stats in correlations.items():
@@ -96,9 +98,15 @@ def run(skip_fetch: bool, config_path: str) -> None:
     click.echo("[5/5] Writing leaderboard and chart...")
     top_n = config["output"]["top_n"]
     bottom_n = config["output"]["bottom_n"]
-    leaderboard = report.generate_report(valued_df, top_n=top_n, bottom_n=bottom_n)
+    leaderboard = report.generate_report(
+        valued_df,
+        top_n=top_n,
+        bottom_n=bottom_n,
+        benchmark_df=benchmark_merged,
+        benchmark_correlations=correlations,
+    )
     click.echo(f"      Wrote {len(leaderboard)}-row leaderboard to {report.LEADERBOARD_CSV}")
-    click.echo(f"      Wrote chart to {report.CHART_PNG}")
+    click.echo(f"      Wrote charts to {report.REPORTS_DIR}")
 
     click.echo("\nTop 5 most undervalued:")
     click.echo(leaderboard.head(5).to_string(index=False))
