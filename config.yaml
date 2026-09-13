@@ -1,0 +1,34 @@
+# Configuration for the NBA Undervalued Assets Model
+#
+# Season framing: we score *completed* 2025-26 production against the
+# player's *currently active* 2026-27 salary. Both numbers are settled
+# (no in-season stats noise, no speculative future-year salary), and this
+# answers the practically useful question -- "is this player's current
+# paycheck justified by what he just did on the floor?"
+
+season:
+  stats_season: "2025-26"        # nba_api season string for production stats
+  advanced_season_end_year: 2026 # bball-ref "season" column (season-ending year)
+  salary_year_column: "2026-27"  # column pulled from the bball-ref contracts table
+
+qualification:
+  min_minutes: 500   # total season minutes to be included in scoring/ranking
+  min_games: 20       # total games played to be included in scoring/ranking
+
+production_score:
+  # Weights must sum to 1.0. Every component is converted to a 0-100
+  # percentile rank within the qualified player pool before weighting,
+  # so the final Production Score is naturally bounded to [0, 100].
+  weights:
+    ts_pct: 0.25        # true shooting % -- overall scoring efficiency
+    pts_per36: 0.15      # points per 36 minutes -- scoring output, role-normalized
+    reb_pct: 0.10        # % of available rebounds grabbed while on court
+    ast_pct: 0.15        # % of teammate FGs assisted while on court
+    stocks_per36: 0.10   # (steals + blocks) per 36 minutes -- defensive activity
+    tov_pct: 0.10        # turnovers per 100 plays used -- inverted (lower is better)
+    usg_pct: 0.05        # usage rate -- offensive load carried
+    pie: 0.10            # player impact estimate -- holistic box-score share
+
+output:
+  top_n: 15
+  bottom_n: 15
